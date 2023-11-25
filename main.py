@@ -23,7 +23,7 @@ def choice():
 def check():
     pass
 
-# 인게임 데모
+# 인게임
 def play():
     global score, perfect, great, good, miss
     
@@ -54,16 +54,15 @@ def play():
     
     # 노트 생성
     def sum_note(n_spot, note_sum_time):
-        note_y = 0
         if n_spot == 1: # d
-            n_d.append([note_y, note_sum_time])
+            n_d.append([-15, note_sum_time])
         if n_spot == 2: # f
-            n_f.append([note_y, note_sum_time])
+            n_f.append([-15, note_sum_time])
         if n_spot == 3: # j
-            n_j.append([note_y, note_sum_time])
+            n_j.append([-15, note_sum_time])
         if n_spot == 4: # k
-            n_k.append([note_y, note_sum_time])
-    
+            n_k.append([-15, note_sum_time])
+            
     # 노트 판정
     def rating(tiledata):
         global perfect, great, good, miss
@@ -84,11 +83,6 @@ def play():
     while load: # 노트 소환
         pygame.display.flip()
         
-        for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_KP1:
-                    sys.exit()
-        
         line = f.readline()
         
         if line == 'end':
@@ -98,8 +92,8 @@ def play():
             data_list.append(list(map(int, line.split('|'))))
             sum_note(data_list[0][0], note_start_time)
             note_start_time += 240 / bpm / data_list[0][1] - (240 / bpm / data_list[0][1]) / 98 * (12 / data_list[0][1])
-            print(note_start_time)
-        
+            del data_list[0]
+    
     while ingame:
         fpsclock.tick(60) # fps 설정
         
@@ -159,7 +153,7 @@ def play():
         
         # 노트출력
         for i in n_d:
-            i[0] = speed # 속도만큼 y좌표를 변경해서 노트가 내려간다.
+            i[0] += speed # 속도만큼 y좌표를 변경해서 노트가 내려간다.
             if i[0] < 960:
                 pygame.draw.rect(screen, (255, 255, 255), [659, i[0], 150.5, 15])
             else:
