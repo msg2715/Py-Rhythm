@@ -1,4 +1,5 @@
-import pygame, sys
+import pygame, sys, time
+from decimal import * # 부동소수점 제거용
 
 # 초기화
 pygame.init()
@@ -19,49 +20,95 @@ fpsclock = pygame.time.Clock()
 def choice():
     pass
 
-
+def check():
+    pass
 
 # 인게임 데모
 def play():
+    global score, perfect, great, good, miss
     
-    # 채보파일 읽고 데이터 저장
-    f = open("Charts\m.txt", "r")
-    n_type, n_spot, note_sum_time = f.readline().split(',')
+    load = True
     
+    f = open("Charts/1.txt", "r")
+    note_start_time = 0
+    bpm = 180.0
+    data_list = []
+    
+    # 점수설정
+    score = 0
+    perfect = 0
+    great = 0
+    good = 0
+    miss = 0
+
     # 노트설정
-    note_y = 0
-    note_sum_time = 0
-    speed = 2
+    speed = 8
     keys = [0, 0, 0, 0]
     keyset = [0, 0, 0, 0]
-    
-    # 노트
     n_d = []
     n_f = []
     n_j = []
     n_k = []
+    gst = time.time()
+    Time = time.time() - gst
     
     # 노트 생성
-    def sum_note():
-        if n_spot == "d":
-            n_d.append([note_y])
-        if n_spot == "f":
-            n_f.append([note_y])
-        if n_spot == "j":
-            n_j.append([note_y])
-        if n_spot == "k":
-            n_k.append([note_y])
+    def sum_note(n_spot, note_sum_time):
+        note_y = 0
+        if n_spot == 1: # d
+            n_d.append([note_y, note_sum_time])
+        if n_spot == 2: # f
+            n_f.append([note_y, note_sum_time])
+        if n_spot == 3: # j
+            n_j.append([note_y, note_sum_time])
+        if n_spot == 4: # k
+            n_k.append([note_y, note_sum_time])
     
-    while True:
+    # 노트 판정
+    def rating(tiledata):
+        global perfect, great, good, miss
+        if len(tiledata) >= 1 and tiledata[0][0] >= 650:
+            if 790 <= tiledata[0][0] + 7.5 <= 820: # perfect
+                tiledata.remove(tiledata[0])
+                perfect += 1
+            elif 770 <= tiledata[0][0] + 7.5 <= 840: # great
+                tiledata.remove(tiledata[0])
+                great += 1
+            elif 740 <= tiledata[0][0] + 7.5 <= 870: # good
+                tiledata.remove(tiledata[0])
+                good += 1
+            else: # miss
+                tiledata.remove(tiledata[0])
+                miss += 1
+
+    while load: # 노트 소환
+        pygame.display.flip()
+        
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_KP1:
+                    sys.exit()
+        
+        line = f.readline()
+        
+        if line == 'end':
+            load = False
+            ingame = True
+        else:
+            data_list.append(list(map(int, line.split('|'))))
+            sum_note(data_list[0][0], note_start_time)
+            note_start_time += 240 / bpm / data_list[0][1] - (240 / bpm / data_list[0][1]) / 98 * (12 / data_list[0][1])
+            print(note_start_time)
+        
+    while ingame:
         fpsclock.tick(60) # fps 설정
+        
         
         keys[0] += (keyset[0] - keys[0]) / (2 * (maxframe / fps))
         keys[1] += (keyset[1] - keys[1]) / (2 * (maxframe / fps))
         keys[2] += (keyset[2] - keys[2]) / (2 * (maxframe / fps))
         keys[3] += (keyset[3] - keys[3]) / (2 * (maxframe / fps))
-        
-        # 노트생성
-        note = None
+
         
         # 이벤트 루프
         for event in pygame.event.get():
@@ -76,12 +123,17 @@ def play():
                 # 리듬게임 키
                 if event.key == pygame.K_d:
                     keyset[0] = 1
+                    rating(n_d)
                 if event.key == pygame.K_f:
                     keyset[1] = 1
+                    rating(n_f)
                 if event.key == pygame.K_j:
                     keyset[2] = 1
+                    rating(n_j)
                 if event.key == pygame.K_k:
                     keyset[3] = 1
+                    rating(n_k)
+                    
                     
             # 키업 이벤트
             if event.type == pygame.KEYDOWN:
@@ -97,9 +149,6 @@ def play():
                     
         screen.fill((0, 0, 0))
         
-        for tile_data in n_d:
-            pass    
-        
         # 양쪽선
         pygame.draw.line(screen, (255, 255, 255), [660, 0], [660, 1080], 6)
         pygame.draw.line(screen, (255, 255, 255), [1260, 0], [1260, 1080], 6)
@@ -108,8 +157,35 @@ def play():
         pygame.draw.line(screen, (255, 255, 255), [659, 800], [1261, 800], 1)
         pygame.draw.line(screen, (255, 255, 255), [659, 810], [1261, 810], 1)
         
+        # 노트출력
+        for i in n_d:
+            i[0] = speed # 속도만큼 y좌표를 변경해서 노트가 내려간다.
+            if i[0] < 960:
+                pygame.draw.rect(screen, (255, 255, 255), [659, i[0], 150.5, 15])
+            else:
+                n_d.remove(i)
+        for i in n_f:
+            i[0] += speed
+            if i[0] < 960:
+                pygame.draw.rect(screen, (255, 255, 255), [809.5, i[0], 150.5, 15])
+            else:
+                n_f.remove(i)
+        for i in n_j:
+            i[0] += speed
+            if i[0] < 960:
+                pygame.draw.rect(screen, (255, 255, 255), [959.5, i[0], 150.5, 15]) 
+            else:
+                n_j.remove(i)
+        for i in n_k:
+            i[0] += speed
+            if i[0] < 960:
+                pygame.draw.rect(screen, (255, 255, 255), [1109.5, i[0], 150.5, 15])
+            else:
+                n_k.remove(i)
+        
         # 화면 출력
-        pygame.display.update()
+        pygame.display.flip()
+
 
 
 
@@ -120,7 +196,7 @@ def main():
     button = 1
     
     # 배경음악
-    main_audio = pygame.mixer.Sound("audio\main_AUDIO.mp3")
+    main_audio = pygame.mixer.Sound("audio\main_AUDIO.mp3") # 12Mornings
     main_audio.play(-1)
     
     while True:
@@ -179,13 +255,11 @@ def main():
                 if event.key == pygame.K_UP:
                     if not button == 1:
                         button -= 1
-                        print(button)
                 
                 # 아래쪽 화살표를 눌렀을 때
                 elif event.key == pygame.K_DOWN:
                     if not button == 3:
                         button += 1
-                        print(button)
 
                 # 엔터키를 눌렀을 때
                 elif event.key == pygame.K_RETURN:
@@ -194,7 +268,7 @@ def main():
                         choice()
                         return
                     if button == 2:
-                        main_audio.stop()
+                        # main_audio.stop()
                         option()
                         return
                     if button == 3:
