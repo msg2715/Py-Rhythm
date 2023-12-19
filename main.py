@@ -24,15 +24,20 @@ def check():
     pass
 
 # 인게임
-def play():
+def play(song_num):
     global score, perfect, great, good, miss
     
     load = True
+    ingame = False
     
     f = open("Charts/1.txt", "r")
+    line_count = 0
     note_start_time = 0
-    bpm = 180.0
+    bpm = 0
     data_list = []
+    rate_data = [0, 0, 0, 0]
+    clock = pygame.time.Clock()
+    maxframe = 60
     
     # 점수설정
     score = 0
@@ -42,26 +47,34 @@ def play():
     miss = 0
 
     # 노트설정
-    speed = 8
+    speed = 2.8
     keys = [0, 0, 0, 0]
     keyset = [0, 0, 0, 0]
     n_d = []
     n_f = []
     n_j = []
     n_k = []
+    
     gst = time.time()
     Time = time.time() - gst
     
+    # 노래설정
+    song = pygame.mixer.Sound(f"audio/{song_num}.mp3")
+    song.set_volume(0.3)
+    song_play = 0
+    
+    
     # 노트 생성
     def sum_note(n_spot, note_sum_time):
+        nst = note_sum_time - Time + 2
         if n_spot == 1: # d
-            n_d.append([-15, note_sum_time])
+            n_d.append([0, nst])
         if n_spot == 2: # f
-            n_f.append([-15, note_sum_time])
+            n_f.append([0, nst])
         if n_spot == 3: # j
-            n_j.append([-15, note_sum_time])
+            n_j.append([0, nst])
         if n_spot == 4: # k
-            n_k.append([-15, note_sum_time])
+            n_k.append([0, nst])
             
     # 노트 판정
     def rating(tiledata):
@@ -85,24 +98,53 @@ def play():
         
         line = f.readline()
         
-        if line == 'end':
+        line_count += 1
+        
+        if line_count == 1:
+            note_start_time = line[11:]
+            note_start_time = float(Decimal(str(note_start_time)))
+        elif line_count == 2:
+            song_start_time = line[11:]
+            song_start_time = float(Decimal(str(song_start_time)))
+        elif line_count == 3:
+            bpm = line[11:]
+            bpm = float(Decimal(str(bpm)))
+        elif line == 'end':
+            gst = time.time()
             load = False
             ingame = True
         else:
             data_list.append(list(map(int, line.split('|'))))
-            sum_note(data_list[0][0], note_start_time)
-            note_start_time += 240 / bpm / data_list[0][1] - (240 / bpm / data_list[0][1]) / 98 * (12 / data_list[0][1])
+            sum_note(data_list[0][0], Time - note_start_time + 2)
+            note_start_time -= 240 / bpm / data_list[0][1]  - (240 / bpm / data_list[0][1]) / 98 * (12 / data_list[0][1])
             del data_list[0]
+            
+        clock.tick(maxframe * 8)
     
     while ingame:
         fpsclock.tick(60) # fps 설정
+        Time = float(Decimal(str(time.time() - gst)))
         
+        SST = 0 # SST : 딜레이 제거용 노래 소환시간 변수
+        if song_play == 0 and song_start_time < Time:
+            song.play()
+            SST = Time - (song_start_time) 
+            song_play += 1
         
         keys[0] += (keyset[0] - keys[0]) / (2 * (maxframe / fps))
         keys[1] += (keyset[1] - keys[1]) / (2 * (maxframe / fps))
         keys[2] += (keyset[2] - keys[2]) / (2 * (maxframe / fps))
         keys[3] += (keyset[3] - keys[3]) / (2 * (maxframe / fps))
-
+        
+        # rate_data
+        if len(n_d) > 0:
+            rate_data[0] = n_d[0][1]
+        if len(n_f) > 0:
+            rate_data[1] = n_f[0][1]
+        if len(n_j) > 0:
+            rate_data[2] = n_j[0][1]
+        if len(n_k) > 0:
+            rate_data[3] = n_k[0][1]
         
         # 이벤트 루프
         for event in pygame.event.get():
@@ -146,39 +188,46 @@ def play():
         # 양쪽선
         pygame.draw.line(screen, (255, 255, 255), [660, 0], [660, 1080], 6)
         pygame.draw.line(screen, (255, 255, 255), [1260, 0], [1260, 1080], 6)
+        
+        pygame.draw.line(screen, (255, 255, 255), [809.5, 0], [809.5, 1080], 1)
+        pygame.draw.line(screen, (255, 255, 255), [960, 0], [960, 1080], 1)
+        pygame.draw.line(screen, (255, 255, 255), [1110.5, 0], [1110.5, 1080], 1)
+        
             
         # 판정선
-        pygame.draw.line(screen, (255, 255, 255), [659, 800], [1261, 800], 1)
-        pygame.draw.line(screen, (255, 255, 255), [659, 810], [1261, 810], 1)
+        pygame.draw.line(screen, (255, 255, 255), [659, 800], [1261, 800], 3)
+        pygame.draw.line(screen, (255, 255, 255), [659, 810], [1261, 810], 3)
         
         # 노트출력
-        for i in n_d:
-            i[0] += speed # 속도만큼 y좌표를 변경해서 노트가 내려간다.
-            if i[0] < 960:
-                pygame.draw.rect(screen, (255, 255, 255), [659, i[0], 150.5, 15])
-            else:
-                n_d.remove(i)
-        for i in n_f:
-            i[0] += speed
-            if i[0] < 960:
-                pygame.draw.rect(screen, (255, 255, 255), [809.5, i[0], 150.5, 15])
-            else:
-                n_f.remove(i)
-        for i in n_j:
-            i[0] += speed
-            if i[0] < 960:
-                pygame.draw.rect(screen, (255, 255, 255), [959.5, i[0], 150.5, 15]) 
-            else:
-                n_j.remove(i)
         for i in n_k:
-            i[0] += speed
+            i[0] = ((1080 / 24) * 17) + (Time + SST - i[1]) * 350 * speed * (1080 / 900)
             if i[0] < 960:
                 pygame.draw.rect(screen, (255, 255, 255), [1109.5, i[0], 150.5, 15])
             else:
                 n_k.remove(i)
+        for i in n_j:
+            i[0] = ((1080 / 24) * 17) + (Time + SST - i[1]) * 350 * speed * (1080 / 900)
+            if i[0] < 960:
+                pygame.draw.rect(screen, (255, 255, 255), [959.5, i[0], 150.5, 15]) 
+            else:
+                n_j.remove(i)
+        for i in n_f:
+            i[0] = ((1080 / 24) * 17) + (Time + SST - i[1]) * 350 * speed * (1080 / 900)
+            if i[0] < 960:
+                pygame.draw.rect(screen, (255, 255, 255), [809.5, i[0], 150.5, 15])
+            else:
+                n_f.remove(i)
+        for i in n_d:
+            i[0] = ((1080 / 24) * 17) + (Time + SST - i[1]) * 350 * speed * (1080 / 900)
+            if i[0] < 960:
+                pygame.draw.rect(screen, (255, 255, 255), [659, i[0], 150.5, 15])
+            else:
+                n_d.remove(i)
         
         # 화면 출력
         pygame.display.flip()
+        
+        clock.tick(maxframe)
 
 
 
@@ -286,4 +335,4 @@ def option():
         # 화면 출력
         pygame.display.update()
 
-play()
+play(1)
