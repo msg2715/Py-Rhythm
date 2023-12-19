@@ -114,8 +114,19 @@ def play(song_num):
             load = False
             ingame = True
         else:
-            data_list.append(list(map(int, line.split('|'))))
-            sum_note(data_list[0][0], Time - note_start_time + 2)
+            data_list.append(list(map(str, line.split('|'))))
+            data_list[0][1] = int(data_list[0][1])
+            
+            # 두개의 노트가 동시에 내려오는 경우도 있어 elif를 사용하지 않음.
+            if "1" in data_list[0][0]:
+                sum_note(1, Time - note_start_time + 2)
+            if "2" in data_list[0][0]:
+                sum_note(2, Time - note_start_time + 2)
+            if "3" in data_list[0][0]:
+                sum_note(3, Time - note_start_time + 2)
+            if "4" in data_list[0][0]:
+                sum_note(4, Time - note_start_time + 2)
+            
             note_start_time -= 240 / bpm / data_list[0][1]  - (240 / bpm / data_list[0][1]) / 98 * (12 / data_list[0][1])
             del data_list[0]
             
