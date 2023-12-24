@@ -1,7 +1,7 @@
 import pygame, sys, time
 from decimal import * # 부동소수점 제거용
 
-# 초기화
+# 초기화fjf
 pygame.init()
 
 # 창 이름 설정
@@ -10,27 +10,94 @@ pygame.display.set_caption("main")
 # 화면크기 설정
 screen = pygame.display.set_mode(flags=pygame.FULLSCREEN) # 화면크기 - 풀스크린
 
-# fps
+# fpsj
 maxframe = 60
 fps = 60
 fpsclock = pygame.time.Clock()
 
-
-# 노래선택(인게임 구현후 구현예정)
-def choice():
-    pass
-
-def check():
-    pass
+# 메인화면
+def main():
+    menu = True
+    button = 0
+    
+    # 배경음악
+    song_0 = pygame.mixer.Sound("audio\\0.mp3")
+    song_1 = pygame.mixer.Sound("audio\\1.mp3")
+    song_2 = pygame.mixer.Sound("audio\\0.mp3")
+    song_0.play(-1)
+    
+    song_list = ["바들바들 동물콘", "Beethoven virus", "summer"]
+    
+    background = pygame.image.load(f"img\\background.jpg")
+    background = pygame.transform.scale(background, (1920, 748))
+    
+    font = pygame.font.Font('font\SDSamliphopangcheTTFOutline.ttf', 40)
+    font2 = pygame.font.Font('font\Jalnan2TTF.ttf', 80)
+    font2_text = font2.render("노래 선택", False, (255, 255, 255))
+    
+    while menu:
+        fpsclock.tick(60) # fps 설정
+        
+        # 노래제목 설정
+        if button == 0:
+            choice1 = font.render("", False, (255, 255, 255))
+        else:
+            choice1 = font.render(song_list[button-1], False, (255, 255, 255))
+            
+        choice2 = font.render("> "+song_list[button]+" <", False, (255, 255, 255))
+        
+        if button == 2:
+            choice3 = font.render("", False, (255, 255, 255))
+        else:
+            choice3 = font.render(song_list[button+1], False, (255, 255, 255))
+        
+        # 썸네일 설정
+        thumbnail = pygame.image.load(f"img\{button}.png")
+        thumbnail = pygame.transform.scale(thumbnail, (800, 450))
+        
+        # 이벤트 루프
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN: # 키다운 이벤트
+                if event.key == pygame.K_UP:
+                    if not button == 0:
+                        button -= 1
+                elif event.key == pygame.K_DOWN:
+                    if not button == 2:
+                        button += 1
+                elif event.key == pygame.K_RETURN:
+                    if button == 0:
+                        song_0.stop()
+                        play(0)
+                        return
+                    if button == 1:
+                        song_0.stop()
+                        play(1)
+                        return
+                    if button == 1:
+                        return
+        
+        screen.fill((0, 0, 0))
+        screen.blit(background, (0, 600))
+        screen.blit(choice1, (1340-(choice1.get_width() / 2), 350-(choice1.get_height() / 2)))
+        screen.blit(choice2, (1340-(choice2.get_width() / 2), 540-(choice2.get_height() / 2)))
+        screen.blit(choice3, (1340-(choice3.get_width() / 2), 730-(choice3.get_height() / 2)))
+        screen.blit(font2_text, (960-(font2_text.get_width() / 2), 150-(font2.get_height() / 2)))
+        
+        screen.blit(thumbnail, (550-(thumbnail.get_width() / 2), 540-(thumbnail.get_height() / 2)))
+        
+        # 화면 출력
+        pygame.display.flip()
 
 # 인게임
 def play(song_num):
-    global score, perfect, great, good, miss
+    global score, perfect, great, good, miss, rate, combo, rate_text_size, combo_text_size, rate_text_color
+    
+    rate = "READY"
     
     load = True
     ingame = False
     
-    f = open("Charts/1.txt", "r")
+    f = open(f"Charts/{song_num}.txt", "r")
     line_count = 0
     note_start_time = 0
     bpm = 0
@@ -40,6 +107,7 @@ def play(song_num):
     maxframe = 60
     
     # 점수설정
+    combo = 0
     score = 0
     perfect = 0
     great = 0
@@ -55,6 +123,11 @@ def play(song_num):
     n_j = []
     n_k = []
     
+    # 배경설정
+    background = pygame.image.load(f"img\{song_num}.png")
+    background = pygame.transform.scale(background, (1920, 1080))
+    background.set_alpha(64)
+    
     gst = time.time()
     Time = time.time() - gst
     
@@ -63,6 +136,9 @@ def play(song_num):
     song.set_volume(0.3)
     song_play = 0
     
+    rate_text_size = 10
+    combo_text_size = 20
+    rate_text_color = (255, 255, 255)
     
     # 노트 생성
     def sum_note(n_spot, note_sum_time):
@@ -78,21 +154,50 @@ def play(song_num):
             
     # 노트 판정
     def rating(tiledata):
-        global perfect, great, good, miss
+        global perfect, great, good, miss , rate, combo, rate_text_size, combo_text_size, rate_text_color
+        test = 1
+        
         if len(tiledata) >= 1 and tiledata[0][0] >= 650:
-            if 790 <= tiledata[0][0] + 7.5 <= 820: # perfect
-                tiledata.remove(tiledata[0])
-                perfect += 1
-            elif 770 <= tiledata[0][0] + 7.5 <= 840: # great
-                tiledata.remove(tiledata[0])
-                great += 1
-            elif 740 <= tiledata[0][0] + 7.5 <= 870: # good
-                tiledata.remove(tiledata[0])
-                good += 1
-            else: # miss
-                tiledata.remove(tiledata[0])
-                miss += 1
-
+            
+            if test == 1:
+                if tiledata[0][0] >= 800: # 테스트용
+                    tiledata.remove(tiledata[0])
+            else:
+                if 770 <= tiledata[0][0] + 7.5 <= 840: # perfect
+                    tiledata.remove(tiledata[0])
+                    perfect += 1
+                    rate = 'perfect'
+                    rate_text_size = 10
+                    combo += 1
+                    combo_text_size = 20
+                    rate_text_color = (153,50,204)
+                elif 750 <= tiledata[0][0] + 7.5 <= 860: # great
+                    tiledata.remove(tiledata[0])
+                    great += 1
+                    rate = 'great'
+                    rate_text_size = 10
+                    combo += 1
+                    combo_text_size = 20
+                    rate_text_color = (102, 255, 255)
+                elif 720 <= tiledata[0][0] + 7.5 <= 870: # good
+                    tiledata.remove(tiledata[0])
+                    good += 1
+                    rate = 'good'
+                    rate_text_size = 10
+                    combo += 1
+                    combo_text_size = 20
+                    rate_text_color = (255, 255, 0)
+                else: # miss
+                    tiledata.remove(tiledata[0])
+                    miss += 1
+                    rate = 'miss'
+                    rate_text_size = 10
+                    combo = 0
+                    combo_text_size = 50
+                    rate_text_color = (102, 102, 102)
+            
+        else:
+            return ''
     while load: # 노트 소환
         pygame.display.flip()
         
@@ -133,8 +238,17 @@ def play(song_num):
         clock.tick(maxframe * 8)
     
     while ingame:
+        
+        test = 1
+        if test == 1:
+            rating(n_d)
+            rating(n_f)
+            rating(n_j)
+            rating(n_k)
+        
         fpsclock.tick(60) # fps 설정
         Time = float(Decimal(str(time.time() - gst)))
+        
         
         SST = 0 # SST : 딜레이 제거용 노래 소환시간 변수
         if song_play == 0 and song_start_time < Time:
@@ -155,7 +269,8 @@ def play(song_num):
         if len(n_j) > 0:
             rate_data[2] = n_j[0][1]
         if len(n_k) > 0:
-            rate_data[3] = n_k[0][1]
+            rate_data[3] = n_k[0][1]    
+        
         
         # 이벤트 루프
         for event in pygame.event.get():
@@ -165,6 +280,7 @@ def play(song_num):
                 
                 # 게임종료(개발용)
                 if event.key == pygame.K_KP0:
+                    print(perfect, great, good, miss)
                     sys.exit()
                     
                 # 리듬게임 키
@@ -183,7 +299,7 @@ def play(song_num):
                     
                     
             # 키업 이벤트
-            if event.type == pygame.KEYDOWN:
+            if event.type == pygame.KEYUP:
                 if event.key == pygame.K_d:
                     keyset[0] = 0
                 if event.key == pygame.K_f:
@@ -192,9 +308,10 @@ def play(song_num):
                     keyset[2] = 0
                 if event.key == pygame.K_k:
                     keyset[3] = 0
-                    
-                    
+        
+        
         screen.fill((0, 0, 0))
+        screen.blit(background, (0, 0))
         
         # 양쪽선
         pygame.draw.line(screen, (255, 255, 255), [660, 0], [660, 1080], 6)
@@ -204,10 +321,32 @@ def play(song_num):
         pygame.draw.line(screen, (255, 255, 255), [960, 0], [960, 1080], 1)
         pygame.draw.line(screen, (255, 255, 255), [1110.5, 0], [1110.5, 1080], 1)
         
-            
+        
         # 판정선
         pygame.draw.line(screen, (255, 255, 255), [659, 800], [1261, 800], 3)
         pygame.draw.line(screen, (255, 255, 255), [659, 810], [1261, 810], 3)
+        
+        
+        if rate_text_size < 30:
+            rate_text_size += 2
+        if combo_text_size < 60:
+            combo_text_size += 5
+        elif combo_text_size > 60:
+            combo_text_size = 60
+        
+        rate_font = pygame.font.Font('font\DNFBitBitv2.ttf', rate_text_size)
+        rate_text = rate_font.render(str(rate), False, rate_text_color)
+        combo_font = pygame.font.Font('font\DNFBitBitv2.ttf', combo_text_size)
+        combo_text = combo_font.render(str(combo), False, (255, 255, 255))
+        
+        
+        # 판정 결과 출력
+        screen.blit(rate_text, (960 - rate_text.get_width() / 2, 670))
+        
+        
+        # 콤보 텍스트 출력
+        screen.blit(combo_text, (960 - combo_text.get_width() / 2, 200))
+        
         
         # 노트출력
         for i in n_k:
@@ -216,134 +355,46 @@ def play(song_num):
                 pygame.draw.rect(screen, (255, 255, 255), [1109.5, i[0], 150.5, 15])
             else:
                 n_k.remove(i)
+                rate = 'miss'
+                combo = 0
+                combo_text_size = 50
+                rate_text_color = (102, 102, 102)
         for i in n_j:
             i[0] = ((1080 / 24) * 17) + (Time + SST - i[1]) * 350 * speed * (1080 / 900)
             if i[0] < 960:
                 pygame.draw.rect(screen, (255, 255, 255), [959.5, i[0], 150.5, 15]) 
             else:
                 n_j.remove(i)
+                rate = 'miss'
+                combo = 0
+                combo_text_size = 50
+                rate_text_color = (102, 102, 102)
         for i in n_f:
             i[0] = ((1080 / 24) * 17) + (Time + SST - i[1]) * 350 * speed * (1080 / 900)
             if i[0] < 960:
                 pygame.draw.rect(screen, (255, 255, 255), [809.5, i[0], 150.5, 15])
             else:
                 n_f.remove(i)
+                rate = 'miss'
+                combo = 0
+                combo_text_size = 50
+                rate_text_color = (102, 102, 102)
         for i in n_d:
             i[0] = ((1080 / 24) * 17) + (Time + SST - i[1]) * 350 * speed * (1080 / 900)
             if i[0] < 960:
                 pygame.draw.rect(screen, (255, 255, 255), [659, i[0], 150.5, 15])
             else:
                 n_d.remove(i)
+                rate = 'miss'
+                combo = 0
+                combo_text_size = 500
+                rate_text_color = (102, 102, 102)
+        
         
         # 화면 출력
         pygame.display.flip()
         
         clock.tick(maxframe)
 
-
-
-
-# 메인화면(UI, 배경화면 미확정)
-running = True
-def main():
-    game_paused = False
-    button = 1
-    
-    # 배경음악
-    main_audio = pygame.mixer.Sound("audio\main_AUDIO.mp3") # 12Mornings
-    main_audio.play(-1)
-    
-    while True:
-        
-        # 자투리 설정
-        fpsclock.tick(60) # fps 설정
-        font = pygame.font.SysFont('malgungothicsemilight', 80)
-        
-        
-        # 배경화면
-        screen.blit(pygame.image.load("img\main_BG.png"), (0, 0))
-        
-        
-        # START 버튼
-        if button == 1:
-            text_start = font.render('START', True, (255, 255, 0))
-        else:
-            text_start = font.render('START', True, (255, 255, 255))
-            
-        text_start_size = text_start.get_rect().size # START 텍스트의 rect의 size 가져오기
-        text_start_width = text_start_size[0] # 가로 사이즈
-        text_start_height = text_start_size[1] # 세로 사이즈
-        screen.blit(text_start, (960 - (text_start_width / 2), 650 - (text_start_height / 2)))
-        
-        # OPTION 버튼
-        if button == 2:
-            text_option = font.render('OPTION', True, (255, 255, 0))
-        else:
-            text_option = font.render('OPTION', True, (255, 255, 255))
-            
-        text_option_size = text_option.get_rect().size # OPTION 텍스트의 rect의 size 가져오기
-        text_option_width = text_option_size[0] # 가로 사이즈
-        text_option_height = text_option_size[1] # 세로 사이즈
-        screen.blit(text_option, (960 - (text_option_width / 2), 800 - (text_option_height / 2)))
-        
-        # QUIT 버튼
-        if button == 3:
-            text_quit = font.render('QUIT', True, (255, 255, 0))
-        else:
-            text_quit = font.render('QUIT', True, (255, 255, 255))
-            
-        text_quit_size = text_quit.get_rect().size # OPTION 텍스트의 rect의 size 가져오기
-        text_quit_width = text_quit_size[0] # 가로 사이즈
-        text_quit_height = text_quit_size[1] # 세로 사이즈
-        screen.blit(text_quit, (960 - (text_quit_width / 2), 950 - (text_quit_height / 2)))
-        
-        
-        # 이벤트 루프
-        for event in pygame.event.get():
-            
-            
-            # 키다운 이벤트
-            if event.type == pygame.KEYDOWN:
-                
-                # 위쪽 화살표를 눌렀을 때
-                if event.key == pygame.K_UP:
-                    if not button == 1:
-                        button -= 1
-                
-                # 아래쪽 화살표를 눌렀을 때
-                elif event.key == pygame.K_DOWN:
-                    if not button == 3:
-                        button += 1
-
-                # 엔터키를 눌렀을 때
-                elif event.key == pygame.K_RETURN:
-                    if button == 1:
-                        main_audio.stop()
-                        choice()
-                        return
-                    if button == 2:
-                        # main_audio.stop()
-                        option()
-                        return
-                    if button == 3:
-                        sys.exit()
-        
-        # 화면 출력
-        pygame.display.update()
-
-
-
-# 옵션화면(UI, 배경화면 미확정)
-def option():
-    while True:
-        fpsclock.tick(60) # fps 설정 - 60
-        
-        # 스프라이트 설정
-        screen.blit(pygame.image.load("img\option_BG.png"), (0, 0)) # 배경화면 출력
-        
-        
-    
-        # 화면 출력
-        pygame.display.update()
-
+#main()
 play(1)
