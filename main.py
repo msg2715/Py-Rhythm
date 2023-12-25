@@ -86,18 +86,30 @@ def main():
                 elif event.key == pygame.K_RETURN:
                     if button == 0:
                         song_0.stop()
+                        song_1.stop()
+                        song_2.stop()
+                        song_3.stop()
                         play(0)
                         return
                     elif button == 1:
+                        song_0.stop()
                         song_1.stop()
+                        song_2.stop()
+                        song_3.stop()
                         play(1)
                         return
                     elif button == 2:
+                        song_0.stop()
+                        song_1.stop()
                         song_2.stop()
+                        song_3.stop()
                         play(2)
                         return
                     elif button == 3:
+                        song_0.stop()
+                        song_1.stop()
                         song_2.stop()
+                        song_3.stop()
                         play(3)
                         return
         
@@ -209,7 +221,7 @@ def play(song_num):
                     combo_text_size = 20
                     rate_text_color = (153,50,204)
                     score += (1000000 / note_num)
-                elif 730 <= tiledata[0][0] + 7.5 <= 880: # great
+                elif 740 <= tiledata[0][0] + 7.5 <= 870: # great
                     tiledata.remove(tiledata[0])
                     great += 1
                     rate = 'great'
