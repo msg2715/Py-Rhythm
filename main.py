@@ -23,7 +23,7 @@ def main():
     # 배경음악
     song_0 = pygame.mixer.Sound("audio\\0.mp3")
     song_1 = pygame.mixer.Sound("audio\\1.mp3")
-    song_2 = pygame.mixer.Sound("audio\\0.mp3")
+    song_2 = pygame.mixer.Sound("audio\\2.mp3")
     song_0.play(-1)
     
     song_list = ["바들바들 동물콘", "Beethoven virus", "summer"]
@@ -61,19 +61,33 @@ def main():
                 if event.key == pygame.K_UP:
                     if not button == 0:
                         button -= 1
+                        if button == 0:
+                            song_1.stop()
+                            song_0.play(-1)
+                        elif button == 1:
+                            song_2.stop()
+                            song_1.play(-1)
                 elif event.key == pygame.K_DOWN:
                     if not button == 2:
                         button += 1
+                        if button == 1:
+                            song_0.stop()
+                            song_1.play(-1)
+                        elif button == 2:
+                            song_1.stop()
+                            song_2.play(-1)
                 elif event.key == pygame.K_RETURN:
                     if button == 0:
                         song_0.stop()
                         play(0)
                         return
                     if button == 1:
-                        song_0.stop()
+                        song_1.stop()
                         play(1)
                         return
-                    if button == 1:
+                    if button == 2:
+                        song_2.stop()
+                        play(2)
                         return
         
         screen.fill((0, 0, 0))
@@ -90,7 +104,7 @@ def main():
 
 # 인게임
 def play(song_num):
-    global score, perfect, great, good, miss, rate, combo, rate_text_size, combo_text_size, rate_text_color
+    global score, perfect, great, good, miss, rate, combo, rate_text_size, combo_text_size, rate_text_color, note_num, score, running_time
     
     rate = "READY"
     
@@ -107,12 +121,21 @@ def play(song_num):
     maxframe = 60
     
     # 점수설정
+    note_num = 0 # 노트의 개수  (점수구할때 사용)
+    if song_num == 0:
+        note_num = 70
+    elif song_num == 1:
+        note_num = 289
+    elif song_num == 2:
+        note_num = 148
+    
     combo = 0
     score = 0
     perfect = 0
     great = 0
     good = 0
     miss = 0
+    score = 0
 
     # 노트설정
     speed = 2.8
@@ -154,8 +177,8 @@ def play(song_num):
             
     # 노트 판정
     def rating(tiledata):
-        global perfect, great, good, miss , rate, combo, rate_text_size, combo_text_size, rate_text_color
-        test = 1
+        global perfect, great, good, miss , rate, combo, rate_text_size, combo_text_size, rate_text_color, note_num, score
+        test = 0
         
         if len(tiledata) >= 1 and tiledata[0][0] >= 650:
             
@@ -171,6 +194,7 @@ def play(song_num):
                     combo += 1
                     combo_text_size = 20
                     rate_text_color = (153,50,204)
+                    score += (1000000 / note_num)
                 elif 750 <= tiledata[0][0] + 7.5 <= 860: # great
                     tiledata.remove(tiledata[0])
                     great += 1
@@ -179,6 +203,7 @@ def play(song_num):
                     combo += 1
                     combo_text_size = 20
                     rate_text_color = (102, 255, 255)
+                    score += (1000000 / note_num) / 5 * 4
                 elif 720 <= tiledata[0][0] + 7.5 <= 870: # good
                     tiledata.remove(tiledata[0])
                     good += 1
@@ -187,6 +212,7 @@ def play(song_num):
                     combo += 1
                     combo_text_size = 20
                     rate_text_color = (255, 255, 0)
+                    score += (1000000 / note_num) / 5 * 3
                 else: # miss
                     tiledata.remove(tiledata[0])
                     miss += 1
@@ -239,7 +265,7 @@ def play(song_num):
     
     while ingame:
         
-        test = 1
+        test = 0
         if test == 1:
             rating(n_d)
             rating(n_f)
@@ -248,6 +274,20 @@ def play(song_num):
         
         fpsclock.tick(60) # fps 설정
         Time = float(Decimal(str(time.time() - gst)))
+        
+        # 노래가 끝나고 결과창 이동
+        if song_num == 0:
+            if Time >= 36:
+                result(score, perfect, great, good, miss, combo)
+                return
+        elif song_num == 1:
+            if Time >= 101:
+                result(score, perfect, great, good, miss, combo)
+                return
+        elif song_num == 2:
+            if Time >= 64:
+                result(score, perfect, great, good, miss, combo)
+                return
         
         
         SST = 0 # SST : 딜레이 제거용 노래 소환시간 변수
@@ -281,7 +321,9 @@ def play(song_num):
                 # 게임종료(개발용)
                 if event.key == pygame.K_KP0:
                     print(perfect, great, good, miss)
-                    sys.exit()
+                    print(score)
+                    print(Time)
+                    return
                     
                 # 리듬게임 키
                 if event.key == pygame.K_d:
@@ -396,5 +438,14 @@ def play(song_num):
         
         clock.tick(maxframe)
 
-#main()
-play(1)
+def result(score, perfect, great, good, miss, combo):
+    
+    
+    
+    screen.fill((0, 0, 0))
+    
+    # 화면 출력
+    pygame.display.flip()
+    
+main()
+#result()
