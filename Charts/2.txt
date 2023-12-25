@@ -1,4 +1,4 @@
-#note_time|2.89
+#note_time|2.87
 #song_time|0
 #song_bpms|086
 0000|004|dummy
