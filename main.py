@@ -209,7 +209,7 @@ def play(song_num):
                     combo_text_size = 20
                     rate_text_color = (153,50,204)
                     score += (1000000 / note_num)
-                elif 750 <= tiledata[0][0] + 7.5 <= 860: # great
+                elif 730 <= tiledata[0][0] + 7.5 <= 880: # great
                     tiledata.remove(tiledata[0])
                     great += 1
                     rate = 'great'
@@ -218,7 +218,7 @@ def play(song_num):
                     combo_text_size = 20
                     rate_text_color = (102, 255, 255)
                     score += (1000000 / note_num) / 5 * 4
-                elif 720 <= tiledata[0][0] + 7.5 <= 870: # good
+                elif 710 <= tiledata[0][0] + 7.5 <= 900: # good
                     tiledata.remove(tiledata[0])
                     good += 1
                     rate = 'good'
@@ -415,7 +415,7 @@ def play(song_num):
         # 노트출력
         for i in n_k:
             i[0] = ((1080 / 24) * 17) + (Time + SST - i[1]) * 350 * speed * (1080 / 900)
-            if i[0] < 960:
+            if i[0] < 900:
                 pygame.draw.rect(screen, (255, 255, 255), [1109.5, i[0], 150.5, 15])
             else:
                 n_k.remove(i)
@@ -428,7 +428,7 @@ def play(song_num):
                 rate_text_color = (102, 102, 102)
         for i in n_j:
             i[0] = ((1080 / 24) * 17) + (Time + SST - i[1]) * 350 * speed * (1080 / 900)
-            if i[0] < 960:
+            if i[0] < 900:
                 pygame.draw.rect(screen, (255, 255, 255), [959.5, i[0], 150.5, 15]) 
             else:
                 n_j.remove(i)
@@ -441,7 +441,7 @@ def play(song_num):
                 rate_text_color = (102, 102, 102)
         for i in n_f:
             i[0] = ((1080 / 24) * 17) + (Time + SST - i[1]) * 350 * speed * (1080 / 900)
-            if i[0] < 960:
+            if i[0] < 900:
                 pygame.draw.rect(screen, (255, 255, 255), [809.5, i[0], 150.5, 15])
             else:
                 n_f.remove(i)
@@ -454,7 +454,7 @@ def play(song_num):
                 rate_text_color = (102, 102, 102)
         for i in n_d:
             i[0] = ((1080 / 24) * 17) + (Time + SST - i[1]) * 350 * speed * (1080 / 900)
-            if i[0] < 960:
+            if i[0] < 900:
                 pygame.draw.rect(screen, (255, 255, 255), [659, i[0], 150.5, 15])
             else:
                 n_d.remove(i)
