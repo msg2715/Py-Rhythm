@@ -24,9 +24,10 @@ def main():
     song_0 = pygame.mixer.Sound("audio\\0.mp3")
     song_1 = pygame.mixer.Sound("audio\\1.mp3")
     song_2 = pygame.mixer.Sound("audio\\2.mp3")
+    song_3 = pygame.mixer.Sound("audio\\3.mp3")
     song_0.play(-1)
     
-    song_list = ["바들바들 동물콘", "Beethoven virus", "summer"]
+    song_list = ["바들바들 동물콘", "Beethoven virus", "summer", "첫눈"]
     
     background = pygame.image.load(f"img\\background.jpg")
     background = pygame.transform.scale(background, (1920, 748))
@@ -46,7 +47,7 @@ def main():
             
         choice2 = font.render("> "+song_list[button]+" <", False, (255, 255, 255))
         
-        if button == 2:
+        if button == 3:
             choice3 = font.render("", False, (255, 255, 255))
         else:
             choice3 = font.render(song_list[button+1], False, (255, 255, 255))
@@ -67,8 +68,11 @@ def main():
                         elif button == 1:
                             song_2.stop()
                             song_1.play(-1)
+                        elif button == 2:
+                            song_3.stop()
+                            song_2.play(-1)
                 elif event.key == pygame.K_DOWN:
-                    if not button == 2:
+                    if not button == 3:
                         button += 1
                         if button == 1:
                             song_0.stop()
@@ -76,18 +80,25 @@ def main():
                         elif button == 2:
                             song_1.stop()
                             song_2.play(-1)
+                        elif button == 3:
+                            song_2.stop()
+                            song_3.play(-1)
                 elif event.key == pygame.K_RETURN:
                     if button == 0:
                         song_0.stop()
                         play(0)
                         return
-                    if button == 1:
+                    elif button == 1:
                         song_1.stop()
                         play(1)
                         return
-                    if button == 2:
+                    elif button == 2:
                         song_2.stop()
                         play(2)
+                        return
+                    elif button == 3:
+                        song_2.stop()
+                        play(3)
                         return
         
         screen.fill((0, 0, 0))
@@ -125,9 +136,11 @@ def play(song_num):
     if song_num == 0:
         note_num = 70
     elif song_num == 1:
-        note_num = 316
+        note_num = 289
     elif song_num == 2:
-        note_num = 150
+        note_num = 148
+    elif song_num == 3:
+        note_num = 149
     
     combo = 0
     max_combo = 0
@@ -179,7 +192,7 @@ def play(song_num):
     # 노트 판정
     def rating(tiledata):
         global perfect, great, good, miss , rate, combo, rate_text_size, combo_text_size, rate_text_color, note_num, score, max_combo
-        test = 0
+        test = 1
         
         if len(tiledata) >= 1 and tiledata[0][0] >= 650:
             
@@ -227,6 +240,7 @@ def play(song_num):
             
         else:
             return ''
+
     while load: # 노트 소환
         
         screen.fill((0, 0, 0))
@@ -269,8 +283,7 @@ def play(song_num):
         clock.tick(maxframe * 8)
     
     while ingame:
-        
-        test = 0
+        test = 1
         if test == 1:
             rating(n_d)
             rating(n_f)
@@ -291,6 +304,10 @@ def play(song_num):
                 sys.exit()
         elif song_num == 2:
             if Time >= 64:
+                result(score, perfect, great, good, miss, max_combo)
+                sys.exit()
+        elif song_num == 3:
+            if Time >= 71:
                 result(score, perfect, great, good, miss, max_combo)
                 sys.exit()
         
@@ -519,4 +536,5 @@ def result(score, perfect, great, good, miss, max_combo):
         # 화면 출력
         pygame.display.flip()
     
-main()
+#main()
+play(3)
