@@ -104,7 +104,7 @@ def main():
 
 # 인게임
 def play(song_num):
-    global score, perfect, great, good, miss, rate, combo, rate_text_size, combo_text_size, rate_text_color, note_num, score, running_time
+    global score, perfect, great, good, miss, rate, combo, rate_text_size, combo_text_size, rate_text_color, note_num, score, max_combo
     
     rate = "READY"
     
@@ -125,11 +125,12 @@ def play(song_num):
     if song_num == 0:
         note_num = 70
     elif song_num == 1:
-        note_num = 289
+        note_num = 316
     elif song_num == 2:
-        note_num = 148
+        note_num = 150
     
     combo = 0
+    max_combo = 0
     score = 0
     perfect = 0
     great = 0
@@ -177,7 +178,7 @@ def play(song_num):
             
     # 노트 판정
     def rating(tiledata):
-        global perfect, great, good, miss , rate, combo, rate_text_size, combo_text_size, rate_text_color, note_num, score
+        global perfect, great, good, miss , rate, combo, rate_text_size, combo_text_size, rate_text_color, note_num, score, max_combo
         test = 0
         
         if len(tiledata) >= 1 and tiledata[0][0] >= 650:
@@ -218,6 +219,8 @@ def play(song_num):
                     miss += 1
                     rate = 'miss'
                     rate_text_size = 10
+                    if combo > max_combo:
+                        max_combo = combo
                     combo = 0
                     combo_text_size = 50
                     rate_text_color = (102, 102, 102)
@@ -225,6 +228,8 @@ def play(song_num):
         else:
             return ''
     while load: # 노트 소환
+        
+        screen.fill((0, 0, 0))
         pygame.display.flip()
         
         line = f.readline()
@@ -278,16 +283,16 @@ def play(song_num):
         # 노래가 끝나고 결과창 이동
         if song_num == 0:
             if Time >= 36:
-                result(score, perfect, great, good, miss, combo)
-                return
+                result(score, perfect, great, good, miss, max_combo)
+                sys.exit()
         elif song_num == 1:
             if Time >= 101:
-                result(score, perfect, great, good, miss, combo)
-                return
+                result(score, perfect, great, good, miss, max_combo)
+                sys.exit()
         elif song_num == 2:
             if Time >= 64:
-                result(score, perfect, great, good, miss, combo)
-                return
+                result(score, perfect, great, good, miss, max_combo)
+                sys.exit()
         
         
         SST = 0 # SST : 딜레이 제거용 노래 소환시간 변수
@@ -323,7 +328,7 @@ def play(song_num):
                     print(perfect, great, good, miss)
                     print(score)
                     print(Time)
-                    return
+                    sys.exit()
                     
                 # 리듬게임 키
                 if event.key == pygame.K_d:
@@ -398,6 +403,9 @@ def play(song_num):
             else:
                 n_k.remove(i)
                 rate = 'miss'
+                miss += 1
+                if combo > max_combo:
+                    max_combo = combo
                 combo = 0
                 combo_text_size = 50
                 rate_text_color = (102, 102, 102)
@@ -408,6 +416,9 @@ def play(song_num):
             else:
                 n_j.remove(i)
                 rate = 'miss'
+                miss += 1
+                if combo > max_combo:
+                    max_combo = combo
                 combo = 0
                 combo_text_size = 50
                 rate_text_color = (102, 102, 102)
@@ -418,6 +429,9 @@ def play(song_num):
             else:
                 n_f.remove(i)
                 rate = 'miss'
+                miss += 1
+                if combo > max_combo:
+                    max_combo = combo
                 combo = 0
                 combo_text_size = 50
                 rate_text_color = (102, 102, 102)
@@ -428,6 +442,9 @@ def play(song_num):
             else:
                 n_d.remove(i)
                 rate = 'miss'
+                miss += 1
+                if combo > max_combo:
+                    max_combo = combo
                 combo = 0
                 combo_text_size = 500
                 rate_text_color = (102, 102, 102)
@@ -438,14 +455,68 @@ def play(song_num):
         
         clock.tick(maxframe)
 
-def result(score, perfect, great, good, miss, combo):
+def result(score, perfect, great, good, miss, max_combo):
+    aaa = True
     
-    
-    
-    screen.fill((0, 0, 0))
-    
-    # 화면 출력
-    pygame.display.flip()
+    while aaa:
+        
+        # 등급 정하기
+        a = 0
+        if score == 1000000:
+            a = 'S+'
+        elif score >= 900000:
+            a = 'S'
+        elif score >= 700000:
+            a = 'A'
+        elif score >= 500000:
+            a = 'B'
+        else:
+            a = 'C'
+        
+        font = pygame.font.Font('font\OKMANFONT.ttf', 170)
+        text = font.render(a, False, (255,255,255))
+        
+        font1 = pygame.font.Font('font\Pretendard-Bold.ttf', 80)
+        text1 = font1.render(f'SCORE : {round(score)}', False, (255, 255, 255))
+        text7 = font1.render('RESULT', False, (255, 255, 255))
+        
+        font2 = pygame.font.Font('font\SDSamliphopangcheTTFOutline.ttf', 50)
+        text2 = font2.render(f'PERFECT : {perfect}', False, (153,50,204) )
+        text3 = font2.render(f'GREAT : {great}', False, (102, 255, 255))
+        text4 = font2.render(f'GOOD : {good}', False, (255, 255, 0))
+        text5 = font2.render(f'MISS : {miss}', False, (102, 102, 102))
+        text6 = font2.render(f'MAX COMBO : {max_combo}', False, (255, 255, 255))
+        
+        font3 = pygame.font.Font('font\Pretendard-Bold.ttf', 30)
+        text8 = font3.render('- 스페이스바를 눌러 메인화면으로 이동 -', False, (255, 255, 255))
+        
+        for event in pygame.event.get():
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_SPACE:
+                    main()
+                    sys.exit()
+        
+        screen.fill((0, 0, 0))
+        
+        circle = pygame.image.load(f"img\circle.jpg")
+        circle = pygame.transform.scale(circle, (1350, 900))
+        screen.blit(circle, (500 - (circle.get_width() / 2), 560 - (circle.get_height() / 2)))
+        #pygame.draw.circle(screen, (255, 255, 255), (550, 540), 300, 10)
+        
+        screen.blit(text, (550 - (text.get_width() / 2), 560 - (text.get_height() / 2)))
+        
+        screen.blit(text1, (1000, 350 - (text1.get_height() / 2)))
+        
+        screen.blit(text2, (1000, 470 - (text2.get_height() / 2)))
+        screen.blit(text3, (1000, 550 - (text3.get_height() / 2)))
+        screen.blit(text4, (1000, 630 - (text4.get_height() / 2)))
+        screen.blit(text5, (1000, 710 - (text5.get_height() / 2)))
+        screen.blit(text6, (1000, 790 - (text5.get_height() / 2)))
+        
+        screen.blit(text7, (960 - (text7.get_width() / 2), 140 - (text7.get_height() / 2)))
+        screen.blit(text8, (1650 - (text8.get_width() / 2), 1050 - (text8.get_height() / 2)))
+            
+        # 화면 출력
+        pygame.display.flip()
     
 main()
-#result()
