@@ -192,7 +192,7 @@ def play(song_num):
     # 노트 판정
     def rating(tiledata):
         global perfect, great, good, miss , rate, combo, rate_text_size, combo_text_size, rate_text_color, note_num, score, max_combo
-        test = 1
+        test = 0
         
         if len(tiledata) >= 1 and tiledata[0][0] >= 650:
             
@@ -283,7 +283,7 @@ def play(song_num):
         clock.tick(maxframe * 8)
     
     while ingame:
-        test = 1
+        test = 0
         if test == 1:
             rating(n_d)
             rating(n_f)
@@ -504,8 +504,8 @@ def result(score, perfect, great, good, miss, max_combo):
         text5 = font2.render(f'MISS : {miss}', False, (102, 102, 102))
         text6 = font2.render(f'MAX COMBO : {max_combo}', False, (255, 255, 255))
         
-        font3 = pygame.font.Font('font\Pretendard-Bold.ttf', 30)
-        text8 = font3.render('- 스페이스바를 눌러 메인화면으로 이동 -', False, (255, 255, 255))
+        font3 = pygame.font.Font('font\Pretendard-Bold.ttf', 25)
+        text8 = font3.render('- 스페이스바를 눌러 선택화면으로 이동 -', False, (255, 255, 255))
         
         for event in pygame.event.get():
             if event.type == pygame.KEYUP:
@@ -517,24 +517,23 @@ def result(score, perfect, great, good, miss, max_combo):
         
         circle = pygame.image.load(f"img\circle.jpg")
         circle = pygame.transform.scale(circle, (1350, 900))
-        screen.blit(circle, (500 - (circle.get_width() / 2), 560 - (circle.get_height() / 2)))
+        screen.blit(circle, (550 - (circle.get_width() / 2), 560 - (circle.get_height() / 2)))
         #pygame.draw.circle(screen, (255, 255, 255), (550, 540), 300, 10)
         
-        screen.blit(text, (550 - (text.get_width() / 2), 560 - (text.get_height() / 2)))
+        screen.blit(text, (595 - (text.get_width() / 2), 560 - (text.get_height() / 2)))
         
-        screen.blit(text1, (1000, 350 - (text1.get_height() / 2)))
+        screen.blit(text1, (1070, 350 - (text1.get_height() / 2)))
         
-        screen.blit(text2, (1000, 470 - (text2.get_height() / 2)))
-        screen.blit(text3, (1000, 550 - (text3.get_height() / 2)))
-        screen.blit(text4, (1000, 630 - (text4.get_height() / 2)))
-        screen.blit(text5, (1000, 710 - (text5.get_height() / 2)))
-        screen.blit(text6, (1000, 790 - (text5.get_height() / 2)))
+        screen.blit(text2, (1070, 470 - (text2.get_height() / 2)))
+        screen.blit(text3, (1070, 550 - (text3.get_height() / 2)))
+        screen.blit(text4, (1070, 630 - (text4.get_height() / 2)))
+        screen.blit(text5, (1070, 710 - (text5.get_height() / 2)))
+        screen.blit(text6, (1070, 790 - (text5.get_height() / 2)))
         
         screen.blit(text7, (960 - (text7.get_width() / 2), 140 - (text7.get_height() / 2)))
-        screen.blit(text8, (1650 - (text8.get_width() / 2), 1050 - (text8.get_height() / 2)))
+        screen.blit(text8, (960 - (text8.get_width() / 2), 1050 - (text8.get_height() / 2)))
             
         # 화면 출력
         pygame.display.flip()
     
-#main()
-play(3)
+main()
