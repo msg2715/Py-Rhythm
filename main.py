@@ -1,7 +1,7 @@
 import pygame, sys, time
 from decimal import * # 부동소수점 제거용
 
-# 초기화fjf
+# 초기화
 pygame.init()
 
 # 창 이름 설정
@@ -127,7 +127,7 @@ def main():
 
 # 인게임
 def play(song_num):
-    global score, perfect, great, good, miss, rate, combo, rate_text_size, combo_text_size, rate_text_color, note_num, score, max_combo
+    global perfect, great, good, miss, rate, combo, rate_text_size, combo_text_size, rate_text_color, note_num, max_combo
     
     rate = "READY"
     
@@ -156,12 +156,10 @@ def play(song_num):
     
     combo = 0
     max_combo = 0
-    score = 0
     perfect = 0
     great = 0
     good = 0
     miss = 0
-    score = 0
 
     # 노트설정
     speed = 2.8
@@ -203,7 +201,7 @@ def play(song_num):
             
     # 노트 판정
     def rating(tiledata):
-        global perfect, great, good, miss , rate, combo, rate_text_size, combo_text_size, rate_text_color, note_num, score, max_combo
+        global perfect, great, good, miss , rate, combo, rate_text_size, combo_text_size, rate_text_color, note_num, max_combo
         test = 0
         
         if len(tiledata) >= 1 and tiledata[0][0] >= 650:
@@ -220,7 +218,6 @@ def play(song_num):
                     combo += 1
                     combo_text_size = 20
                     rate_text_color = (153,50,204)
-                    score += (1000000 / note_num)
                 elif 740 <= tiledata[0][0] + 7.5 <= 870: # great
                     tiledata.remove(tiledata[0])
                     great += 1
@@ -229,7 +226,6 @@ def play(song_num):
                     combo += 1
                     combo_text_size = 20
                     rate_text_color = (102, 255, 255)
-                    score += (1000000 / note_num) / 5 * 4
                 elif 710 <= tiledata[0][0] + 7.5 <= 900: # good
                     tiledata.remove(tiledata[0])
                     good += 1
@@ -238,7 +234,6 @@ def play(song_num):
                     combo += 1
                     combo_text_size = 20
                     rate_text_color = (255, 255, 0)
-                    score += (1000000 / note_num) / 5 * 3
                 else: # miss
                     tiledata.remove(tiledata[0])
                     miss += 1
@@ -308,19 +303,19 @@ def play(song_num):
         # 노래가 끝나고 결과창 이동
         if song_num == 0:
             if Time >= 36:
-                result(score, perfect, great, good, miss, max_combo)
+                result(perfect, great, good, miss, max_combo)
                 sys.exit()
         elif song_num == 1:
             if Time >= 101:
-                result(score, perfect, great, good, miss, max_combo)
+                result(perfect, great, good, miss, max_combo)
                 sys.exit()
         elif song_num == 2:
             if Time >= 64:
-                result(score, perfect, great, good, miss, max_combo)
+                result(perfect, great, good, miss, max_combo)
                 sys.exit()
         elif song_num == 3:
             if Time >= 71:
-                result(score, perfect, great, good, miss, max_combo)
+                result(perfect, great, good, miss, max_combo)
                 sys.exit()
         
         
@@ -354,9 +349,6 @@ def play(song_num):
                 
                 # 게임종료(개발용)
                 if event.key == pygame.K_KP0:
-                    print(perfect, great, good, miss)
-                    print(score)
-                    print(Time)
                     sys.exit()
                     
                 # 리듬게임 키
@@ -484,7 +476,10 @@ def play(song_num):
         
         clock.tick(maxframe)
 
-def result(score, perfect, great, good, miss, max_combo):
+def result(perfect, great, good, miss, max_combo):
+    note_num = perfect + great + good + miss
+    score = (1000000 / note_num * perfect) + (1000000 / note_num / 5 * 4 * great) + (1000000 / note_num / 5 * 3 * good)
+    
     aaa = True
     
     while aaa:
