@@ -27,7 +27,7 @@ def main():
     song_3 = pygame.mixer.Sound("audio\\3.mp3")
     song_0.play(-1)
     
-    song_list = ["바들바들 동물콘", "Beethoven virus", "summer", "첫눈"]
+    song_list = ["바들바들 동물콘", "summer", "첫눈", "Beethoven virus"]
     
     background = pygame.image.load(f"img\\background.jpg")
     background = pygame.transform.scale(background, (1920, 748))
@@ -127,7 +127,7 @@ def main():
 
 # 인게임
 def play(song_num):
-    global perfect, great, good, miss, rate, combo, rate_text_size, combo_text_size, rate_text_color, note_num, max_combo
+    global perfect, great, good, miss, rate, combo, rate_text_size, combo_text_size, rate_text_color, max_combo
     
     rate = "READY"
     
@@ -144,16 +144,6 @@ def play(song_num):
     maxframe = 60
     
     # 점수설정
-    note_num = 0 # 노트의 개수  (점수구할때 사용)
-    if song_num == 0:
-        note_num = 70
-    elif song_num == 1:
-        note_num = 289
-    elif song_num == 2:
-        note_num = 148
-    elif song_num == 3:
-        note_num = 149
-    
     combo = 0
     max_combo = 0
     perfect = 0
@@ -201,7 +191,7 @@ def play(song_num):
             
     # 노트 판정
     def rating(tiledata):
-        global perfect, great, good, miss , rate, combo, rate_text_size, combo_text_size, rate_text_color, note_num, max_combo
+        global perfect, great, good, miss , rate, combo, rate_text_size, combo_text_size, rate_text_color, max_combo
         test = 0
         
         if len(tiledata) >= 1 and tiledata[0][0] >= 650:
